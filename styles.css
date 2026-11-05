@@ -78,7 +78,7 @@ html[data-enhanced=true] .falling-star{top:-40px;animation:star-fall var(--durat
 .scene-christmas{background:#510001}
 .scene-family{background:var(--wine)}
 .closing-quote{max-width:900px;margin:5px auto 65px}
-.closing-quote p{font-size:clamp(29px,3.2vw,46px);font-weight:300;line-height:1.3;text-wrap:balance;margin:0}
+.closing-quote p{font-family:InvitationScript,Georgia,serif;font-size:clamp(38px,4.4vw,62px);font-weight:400;line-height:1.4;text-wrap:balance;margin:0}
 .closing-quote cite{display:block;font:11px/1.6 Arial,sans-serif;margin-top:22px;opacity:.75}
 .event-date{font-size:25px;font-weight:400;line-height:1.4;margin:0 0 30px}
 .event-contacts{margin:52px auto 0;max-width:650px;padding-top:28px;border-top:1px solid #fff1dd33}
@@ -131,7 +131,7 @@ html[data-motion-off=true] .countdown-section .closing-star{visibility:visible}
   .story-scene.has-photo{padding:75px 24px 85px 84px;gap:32px}
   .scene-number{left:84px;bottom:32px;font-size:9px}
   .closing-quote{margin-bottom:54px}
-  .closing-quote p{font-size:29px}
+  .closing-quote p{font-size:36px}
   .closing-quote br{display:none}
   .event-date{font-size:22px}
   .event-contacts{margin-top:38px}
