@@ -153,7 +153,8 @@
   const daysLabel = document.getElementById('count-days-label');
   const hoursNode = document.getElementById('count-hours');
   const minutesNode = document.getElementById('count-minutes');
-  const plural = n => n % 100 >= 11 && n % 100 <= 14 ? 'дней' : n % 10 === 1 ? 'день' : n % 10 >= 2 && n % 10 <= 4 ? 'дня' : 'дней';
+  const secondsNode = document.getElementById('count-seconds');
+  const plural = (n, forms = ['день', 'дня', 'дней']) => n % 100 >= 11 && n % 100 <= 14 ? forms[2] : n % 10 === 1 ? forms[0] : n % 10 >= 2 && n % 10 <= 4 ? forms[1] : forms[2];
   let timer;
   function tick() {
     const remaining = timestamp - Date.now();
@@ -169,11 +170,13 @@
     const days = Math.floor(remaining / 86400000);
     const hours = Math.floor(remaining / 3600000) % 24;
     const minutes = Math.floor(remaining / 60000) % 60;
+    const seconds = Math.floor(remaining / 1000) % 60;
     daysNode.textContent = String(days);
     daysLabel.textContent = plural(days);
     hoursNode.textContent = String(hours).padStart(2, '0');
     minutesNode.textContent = String(minutes).padStart(2, '0');
-    values.setAttribute('aria-label', `${days} ${plural(days)}, ${hours} часов, ${minutes} минут до встречи`);
+    secondsNode.textContent = String(seconds).padStart(2, '0');
+    values.setAttribute('aria-label', `${days} ${plural(days)}, ${hours} ${plural(hours, ['час', 'часа', 'часов'])}, ${minutes} ${plural(minutes, ['минута', 'минуты', 'минут'])}, ${seconds} ${plural(seconds, ['секунда', 'секунды', 'секунд'])} до встречи`);
   }
   tick();
   if (timestamp > Date.now()) timer = setInterval(tick, 1000);
