@@ -1,25 +1,15 @@
 (() => {
   'use strict';
   const root = document.documentElement;
-  const control = document.getElementById('motion-toggle');
-  const label = document.getElementById('motion-label');
   const media = matchMedia('(prefers-reduced-motion: reduce)');
-  let paused = false;
   let heroVisible = true;
   let refreshJourney = () => {};
 
   function reflectMotion() {
-    root.dataset.paused = String(paused || media.matches);
-    control.disabled = media.matches;
-    root.dataset.motionOff = String(paused || media.matches);
+    root.dataset.motionOff = String(media.matches);
     refreshJourney();
-    control.setAttribute('aria-pressed', String(paused));
-    control.setAttribute('aria-label', media.matches ? 'Анимация отключена настройками устройства' : paused ? 'Возобновить падающие звёзды' : 'Остановить падающие звёзды');
-    label.textContent = media.matches ? 'Без анимации' : paused ? 'Продолжить' : 'Пауза';
   }
   root.dataset.enhanced = 'true';
-  control.hidden = false;
-  control.addEventListener('click', () => { paused = !paused; reflectMotion(); });
   media.addEventListener('change', reflectMotion);
   reflectMotion();
 
@@ -50,11 +40,14 @@
 
   function updateJourney() {
     pendingFrame = false;
-    if (!geometry || paused || media.matches) return;
-    const {points, total, startY, endY, maxScroll} = geometry;
+    if (!geometry || media.matches) return;
+    const {points, total, startY, endY, heroHeight} = geometry;
     if (scrollY > 3) root.dataset.journeyStarted = 'true';
-    const fraction = Math.min(1, Math.max(0, scrollY / maxScroll));
-    const targetY = startY + (endY - startY) * fraction;
+    // Keep the star in view instead of tying its speed to the full page height.
+    // Ease its viewport anchor from the hero seed to the reading area.
+    const handoff = Math.min(1, Math.max(0, scrollY / heroHeight));
+    const anchorY = startY + (innerHeight * .45 - startY) * handoff;
+    const targetY = Math.min(endY, Math.max(startY, scrollY + anchorY));
     let lo = 0, hi = points.length - 1;
     while (hi - lo > 1) {
       const mid = Math.floor((lo + hi) / 2);
@@ -108,7 +101,7 @@
       const point = track.getPointAtLength(length);
       points.push({y:point.y, length});
     }
-    geometry = {points,total,startY,endY,maxScroll:Math.max(1,height - innerHeight)};
+    geometry = {points,total,startY,endY,heroHeight:Math.max(1,hero.offsetHeight)};
     journey.removeAttribute('hidden');
     updateJourney();
   }
