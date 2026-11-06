@@ -2,7 +2,7 @@
 @font-face{font-family:InvitationScript;src:url('fonts/GreatVibes-Regular.ttf') format('truetype');font-weight:400;font-style:normal;font-display:swap}
 :root{
   color-scheme:dark;
-  --wine:#600001;--paper:#fff1dd;--silver:#d4d7d9;--ink:#79101a;
+  --wine:#80011F;--paper:#fff1dd;--silver:#d4d7d9;--ink:#80011F;
   --gutter:clamp(24px,4.2vw,76px);
   font-family:InvitationSerif,Georgia,serif;font-synthesis:none;
 }
@@ -61,7 +61,7 @@ html[data-enhanced=true] .falling-star{top:-40px;animation:star-fall var(--durat
 .scene-note{font-size:clamp(22px,2vw,29px);font-weight:300;line-height:1.45;margin:24px 0 0;max-width:34ch;text-wrap:pretty}
 .scene-music,.scene-christmas{justify-content:flex-end}
 .scene-warmth{background:var(--paper);color:var(--ink);border:0}
-.scene-christmas{background:#510001}
+.scene-christmas{background:var(--wine)}
 .scene-family{background:var(--wine)}
 .closing-quote{max-width:900px;margin:5px auto 65px}
 .closing-quote p{font-family:InvitationScript,Georgia,serif;font-size:clamp(38px,4.4vw,62px);font-weight:400;line-height:1.4;text-wrap:balance;margin:0}
