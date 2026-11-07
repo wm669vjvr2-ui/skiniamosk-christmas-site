@@ -19,7 +19,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--paper);outline-offs
 .invitation{min-height:780px;min-height:max(780px,100svh);position:relative;isolation:isolate;display:grid;grid-template-rows:auto 1fr auto;overflow:hidden;background:var(--wine)}
 .paper-grain{position:absolute;inset:0;pointer-events:none;z-index:-1;opacity:.055;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.68' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' opacity='.7' filter='url(%23n)'/%3E%3C/svg%3E")}
 .masthead{padding:22px var(--gutter);display:flex;align-items:center;justify-content:space-between;position:relative;z-index:2}
-.wordmark{font-size:23px;letter-spacing:.19em;text-decoration:none;font-weight:400;line-height:1.6}
+.wordmark{font-size:23px;letter-spacing:.1em;text-decoration:none;font-weight:400;line-height:1.6}
 .hero{position:relative;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px 24px 32px}
 .guiding-star{width:67px;height:101px;margin-bottom:34px;flex:none;filter:drop-shadow(0 0 16px #f8efcb15)}
 .eyebrow{font-family:Arial,sans-serif;font-size:11px;font-weight:400;letter-spacing:.26em;line-height:1.7;margin:0 0 24px;text-wrap:balance}
@@ -48,6 +48,9 @@ html[data-enhanced=true] .falling-star{top:-40px;animation:star-fall var(--durat
 .countdown-unit{font:11px/1.6 Arial,sans-serif;margin-top:13px}
 .closing-signature{font-family:InvitationScript,Georgia,serif;font-size:35px;line-height:1.6;margin:30px 0}
 .back-to-top{font:11px/1.5 Arial,sans-serif;min-height:44px;display:inline-flex;align-items:center;text-decoration-color:#fff1dd66;text-underline-offset:5px}
+.organization-details{max-width:680px;margin:40px auto 0;padding-top:24px;border-top:1px solid #fff1dd33;font:13px/1.65 Arial,sans-serif;opacity:.78;text-wrap:balance}
+.organization-details p{margin:0}
+.organization-details p+p{margin-top:8px}
 .star-journey{position:absolute;inset:0;pointer-events:none;width:100%;overflow:visible;z-index:3}
 .journey-track{stroke:var(--silver);stroke-width:.8;opacity:.13}
 .journey-trail{stroke:var(--silver);stroke-width:1.1;opacity:.74;stroke-linecap:round}
@@ -85,7 +88,7 @@ html[data-motion-off=true] .countdown-section .closing-star{visibility:visible}
 @media(max-width:40rem){
   .invitation{min-height:max(700px,100svh)}
   .masthead{padding:16px 23px}
-  .wordmark{font-size:20px;letter-spacing:.15em}
+  .wordmark{font-size:20px;letter-spacing:.08em}
   .hero{padding:22px 18px 32px}
   .guiding-star{width:48px;height:72px;margin-bottom:33px}
   .eyebrow{font-size:9px;letter-spacing:.2em;margin-bottom:27px}
@@ -116,7 +119,7 @@ html[data-motion-off=true] .countdown-section .closing-star{visibility:visible}
   .contact-links{gap:12px}
   .contact-links a{font-size:14px}
 }
-@media(max-width:22rem){.footer-note{max-width:245px;margin-inline:auto}.eyebrow{font-size:8px}.headline-serif{font-size:35px}}
+@media(max-width:22rem){.footer-note{max-width:245px;margin-inline:auto}.eyebrow{font-size:8px}.headline-serif{font-size:35px}.closing-signature{font-size:30px}}
 @media(max-height:46rem) and (min-width:40rem){.invitation{min-height:670px}.guiding-star{width:42px;height:63px;margin-bottom:20px}.hero{padding-block:10px}.eyebrow{margin-bottom:16px}.headline-serif{font-size:64px}.headline-script{font-size:180px}.welcome{margin-top:4px}.masthead{padding-block:12px}.invitation-footer{padding-bottom:20px}}
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
