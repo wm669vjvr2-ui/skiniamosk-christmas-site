@@ -28,7 +28,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--paper);outline-offs
 .headline{font-weight:400;margin:0;display:flex;flex-direction:column;align-items:center;max-width:100%;line-height:1;color:var(--champagne)}
 .headline-serif{font-family:InvitationDisplay,Georgia,serif;font-size:clamp(50px,6.5vw,100px);font-weight:400;letter-spacing:.035em;line-height:1.05;white-space:nowrap}
 .headline-script{font-family:InvitationHeroScript,'Times New Roman',serif;font-size:clamp(150px,17.5vw,258px);font-weight:400;line-height:1.3;display:block;margin-top:-5px;padding:0 .18em .05em 0}
-.headline-initial{font-size:.32em;line-height:0}
+.headline-initial{font-family:InvitationDisplay,Georgia,serif;font-size:.72em;line-height:0;display:inline-block;transform:skewX(-12deg);transform-origin:50% 100%;margin-right:.01em}
 .hero-quote{max-width:570px;font-size:clamp(20px,1.9vw,26px);font-weight:400;line-height:1.45;margin:8px auto 0;text-wrap:balance;color:var(--champagne)}
 html[data-font-metrics=legacy] .headline-script{position:relative;top:-1.533em}
 html[data-font-metrics=legacy] .audience-section h2,html[data-font-metrics=legacy] .closing-quote p,html[data-font-metrics=legacy] .closing-signature{position:relative;top:-1.283em}
