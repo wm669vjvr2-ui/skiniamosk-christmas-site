@@ -1,6 +1,7 @@
 (() => {
   'use strict';
   const root = document.documentElement;
+  root.dataset.fontMetrics = typeof FontFace !== 'undefined' && 'ascentOverride' in FontFace.prototype ? 'native' : 'legacy';
   const media = matchMedia('(prefers-reduced-motion: reduce)');
   let heroVisible = true;
   let refreshJourney = () => {};
@@ -41,11 +42,11 @@
   function updateJourney() {
     pendingFrame = false;
     if (!geometry || media.matches) return;
-    const {points, total, startY, endY, heroHeight} = geometry;
+    const {points, total, startY, endY, heroHeight, contacts} = geometry;
     if (scrollY > 3) root.dataset.journeyStarted = 'true';
     // Keep the star in view instead of tying its speed to the full page height.
     // Ease its viewport anchor from the hero seed to the reading area.
-    const handoff = Math.min(1, Math.max(0, scrollY / heroHeight));
+    const handoff = Math.min(1, Math.max(0, scrollY / (heroHeight * .5)));
     const anchorY = startY + (innerHeight * .45 - startY) * handoff;
     const targetY = Math.min(endY, Math.max(startY, scrollY + anchorY));
     let lo = 0, hi = points.length - 1;
@@ -59,6 +60,11 @@
     const point = track.getPointAtLength(length);
     follower.setAttribute('transform', `translate(${point.x.toFixed(2)} ${point.y.toFixed(2)})`);
     trail.setAttribute('stroke-dashoffset', String(total - length));
+    contacts.forEach(contact => {
+      if (targetY >= contact.y - 110) contact.element.classList.add('is-seen');
+      const touching = Math.abs(point.y - contact.y) < 34 && Math.abs(point.x - contact.x) < 40;
+      contact.element.classList.toggle('is-lit', touching);
+    });
   }
   function requestJourney() {
     if (!pendingFrame) {
@@ -77,11 +83,31 @@
     const closing = end.querySelector('.closing-star');
     const endY = position(closing) + closing.getBoundingClientRect().height * .5;
     const knots = [{x: width * .81, y: startY}];
-    scenes.forEach((scene, i) => {
-      const x = compact ? (i % 2 ? 32 : 45) : width * (scene.dataset.pathSide === 'right' ? .80 : .20);
+    const contacts = [];
+    scenes.forEach(scene => {
+      const art = scene.querySelector('.scene-art');
+      const anchor = art.querySelector('.symbol-touchpoint').getBoundingClientRect();
+      const artBox = art.getBoundingClientRect();
       const top = position(scene);
-      knots.push({x, y: top + scene.offsetHeight * .48});
+      const bottom = top + scene.offsetHeight;
+      const x = anchor.left + anchor.width * .5;
+      const y = anchor.top + scrollY + anchor.height * .5;
+      contacts.push({x, y, element:art});
+      if (compact) {
+        knots.push({x:32, y:top + 16});
+        knots.push({x, y});
+        knots.push({x:32, y:artBox.bottom + scrollY + 26});
+        knots.push({x:32, y:bottom - 24});
+      } else {
+        knots.push({x, y:top + 60});
+        knots.push({x, y});
+        knots.push({x, y:bottom - 60});
+      }
     });
+    const audience = document.querySelector('.audience-section');
+    const edgeX = compact ? 12 : width * .1;
+    knots.push({x:edgeX, y:position(audience) + 24});
+    knots.push({x:edgeX, y:position(audience) + audience.offsetHeight - 24});
     knots.push({x: width * .5, y: endY});
     let d = `M ${knots[0].x} ${knots[0].y}`;
     knots.slice(1).forEach((p, i) => {
@@ -101,7 +127,7 @@
       const point = track.getPointAtLength(length);
       points.push({y:point.y, length});
     }
-    geometry = {points,total,startY,endY,heroHeight:Math.max(1,hero.offsetHeight)};
+    geometry = {points,total,startY,endY,contacts,heroHeight:Math.max(1,hero.offsetHeight)};
     journey.removeAttribute('hidden');
     updateJourney();
   }
@@ -117,22 +143,6 @@
   window.addEventListener('pageshow', requestRebuild);
   document.fonts.ready.then(requestRebuild);
   requestRebuild();
-
-  // Copy is readable without JavaScript, reduced motion or observer support.
-  if ('IntersectionObserver' in window) {
-    const reveal = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.remove('is-waiting');
-          reveal.unobserve(entry.target);
-        }
-      });
-    }, {threshold:.22});
-    document.querySelectorAll('.reveal-copy').forEach(copy => {
-      copy.classList.add('is-waiting');
-      reveal.observe(copy);
-    });
-  }
 
   const countdown = document.getElementById('countdown');
   const iso = countdown.dataset.eventDate;
