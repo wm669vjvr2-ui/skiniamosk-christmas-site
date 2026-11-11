@@ -1,7 +1,6 @@
 @font-face{font-family:InvitationBody;src:local('Calibri'),url('fonts/Carlito-Regular.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
 @font-face{font-family:InvitationDisplay;src:url('fonts/AubreyPro-Regular.otf') format('opentype');font-weight:400;font-style:normal;font-display:swap}
 @font-face{font-family:InvitationScript;src:url('fonts/EkaterinaVelikayaOne.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap;ascent-override:120%;descent-override:90%;line-gap-override:0%}
-@font-face{font-family:InvitationHeroScript;src:url('fonts/EkaterinaVelikayaOne.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap;ascent-override:55%;descent-override:75%;line-gap-override:0%}
 :root{
   color-scheme:dark;
   --wine:#80011F;--paper:#F7E6CA;--champagne:#F7E6CA;--silver:#d4d7d9;--ink:#80011F;
@@ -27,10 +26,8 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--paper);outline-offs
 .eyebrow{font-family:InvitationBody,Calibri,Arial,sans-serif;font-size:11px;font-weight:400;letter-spacing:.26em;line-height:1.7;margin:0 0 24px;text-wrap:balance}
 .headline{font-weight:400;margin:0;display:flex;flex-direction:column;align-items:center;max-width:100%;line-height:1;color:var(--champagne)}
 .headline-serif{font-family:InvitationDisplay,Georgia,serif;font-size:clamp(50px,6.5vw,100px);font-weight:400;letter-spacing:.035em;line-height:1.05;white-space:nowrap}
-.headline-script{font-family:InvitationHeroScript,'Times New Roman',serif;font-size:clamp(150px,17.5vw,258px);font-weight:400;line-height:1.3;display:block;margin-top:-5px;padding:0 .18em .05em 0}
-.headline-initial{font-family:InvitationDisplay,Georgia,serif;font-size:.72em;line-height:0;display:inline-block;transform:skewX(-12deg);transform-origin:50% 100%;margin-right:.01em}
+.headline-script{font-family:InvitationDisplay,Georgia,serif;font-size:clamp(130px,14vw,206px);font-weight:400;line-height:1.16;display:block;white-space:nowrap;margin-top:9px;padding:0 .08em .06em;letter-spacing:.005em;transform:skewX(-12deg)}
 .hero-quote{max-width:570px;font-size:clamp(20px,1.9vw,26px);font-weight:400;line-height:1.45;margin:8px auto 0;text-wrap:balance;color:var(--champagne)}
-html[data-font-metrics=legacy] .headline-script{position:relative;top:-1.533em}
 html[data-font-metrics=legacy] .audience-section h2,html[data-font-metrics=legacy] .closing-quote p,html[data-font-metrics=legacy] .closing-signature{position:relative;top:-1.283em}
 .hero-event{font-size:24px;line-height:1.35;font-weight:400;margin:23px 0 0}
 .invitation-footer{padding:18px var(--gutter) 27px;text-align:center;position:relative;z-index:2}
@@ -110,7 +107,7 @@ html[data-motion-off=true] .countdown-section .closing-star{visibility:visible}
   .guiding-star{width:48px;height:72px;margin-bottom:33px}
   .eyebrow{font-size:9px;letter-spacing:.2em;margin-bottom:27px}
   .headline-serif{font-size:clamp(36px,10vw,62px);letter-spacing:.025em}
-  .headline-script{font-size:clamp(142px,39vw,220px);line-height:1.3;margin-top:5px;padding-right:.12em}
+  .headline-script{font-size:clamp(110px,30vw,176px);margin-top:12px}
   .hero-quote{font-size:19px;line-height:1.4;margin-top:10px;max-width:29ch}
   .invitation-footer{padding:16px 24px max(24px,env(safe-area-inset-bottom))}
   .open-invitation{min-height:56px;font-size:20px;width:100%;max-width:360px;padding:12px 20px}
