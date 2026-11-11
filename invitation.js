@@ -88,21 +88,24 @@
       const art = scene.querySelector('.scene-art');
       const anchor = art.querySelector('.symbol-touchpoint').getBoundingClientRect();
       const artBox = art.getBoundingClientRect();
+      const copyBox = scene.querySelector('.scene-copy').getBoundingClientRect();
       const top = position(scene);
       const bottom = top + scene.offsetHeight;
       const x = anchor.left + anchor.width * .5;
       const y = anchor.top + scrollY + anchor.height * .5;
       contacts.push({x, y, element:art});
-      if (compact) {
-        knots.push({x:32, y:top + 16});
-        knots.push({x, y});
-        knots.push({x:32, y:artBox.bottom + scrollY + 26});
-        knots.push({x:32, y:bottom - 24});
-      } else {
-        knots.push({x, y:top + 60});
-        knots.push({x, y});
-        knots.push({x, y:bottom - 60});
-      }
+      const clearance = compact ? 26 : 56;
+      const leftRail = Math.max(14, copyBox.left - clearance);
+      const rightRail = Math.min(width - 14, copyBox.right + clearance);
+      const exitsRight = scene.dataset.pathSide === 'right';
+      // Cross diagonally through the illustration above the text, then follow
+      // the outside margin until the next illustration changes the direction.
+      const entryX = exitsRight ? leftRail : rightRail;
+      const exitX = exitsRight ? rightRail : leftRail;
+      knots.push({x:entryX, y:top + 16});
+      knots.push({x, y});
+      knots.push({x:exitX, y:artBox.bottom + scrollY + 26});
+      knots.push({x:exitX, y:bottom - 24});
     });
     const audience = document.querySelector('.audience-section');
     const edgeX = compact ? 12 : width * .1;
