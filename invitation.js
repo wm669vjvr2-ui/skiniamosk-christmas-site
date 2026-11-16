@@ -14,7 +14,10 @@
   media.addEventListener('change', reflectMotion);
   reflectMotion();
 
-  function reflectVisibility() { root.dataset.offscreen = String(document.hidden || !heroVisible); }
+  function reflectVisibility() {
+    root.dataset.offscreen = String(document.hidden || !heroVisible);
+    root.dataset.pageHidden = String(document.hidden);
+  }
   document.addEventListener('visibilitychange', reflectVisibility);
   if ('IntersectionObserver' in window) {
     const observer = new IntersectionObserver(entries => {
@@ -33,6 +36,24 @@
   const track = document.getElementById('journey-track');
   const trail = document.getElementById('journey-trail');
   const follower = document.getElementById('travelling-star');
+  const lamplight = document.getElementById('travelling-light');
+  const glow = document.getElementById('journey-glow');
+  const glowCore = document.getElementById('journey-glow-core');
+  const softening = document.getElementById('route-soften');
+  const sparks = document.getElementById('journey-sparks');
+  const clearance = document.getElementById('reading-clearance');
+  const clearanceField = document.getElementById('reading-clearance-field');
+  const clearanceText = document.getElementById('reading-clearance-text');
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const sparkNodes = Array.from({length:7}, (_, index) => {
+    const group = document.createElementNS(svgNS, 'g');
+    const dot = document.createElementNS(svgNS, 'circle');
+    dot.setAttribute('r', String(index % 2 ? 1.1 : .7));
+    dot.setAttribute('class', 'journey-spark');
+    group.append(dot);
+    sparks.append(group);
+    return group;
+  });
   const hero = document.getElementById('main');
   const scenes = Array.from(document.querySelectorAll('.story-scene'));
   let geometry = null;
@@ -58,8 +79,32 @@
     const ratio = Math.min(1, Math.max(0, (targetY - a.y) / Math.max(.01, b.y - a.y)));
     const length = a.length + (b.length - a.length) * ratio;
     const point = track.getPointAtLength(length);
-    follower.setAttribute('transform', `translate(${point.x.toFixed(2)} ${point.y.toFixed(2)})`);
+    const transform = `translate(${point.x.toFixed(2)} ${point.y.toFixed(2)})`;
+    follower.setAttribute('transform', transform);
+    lamplight.setAttribute('transform', transform);
     trail.setAttribute('stroke-dashoffset', String(total - length));
+    // Only the last short part of the route emits light. The page-space mask
+    // leaves a dark safety margin around every reading block.
+    const tail = Math.min(length, 200);
+    [glow, glowCore].forEach(path => {
+      path.setAttribute('stroke-dasharray', `${Math.max(.01, tail)} ${total}`);
+      path.setAttribute('stroke-dashoffset', String(tail - length));
+    });
+    const glowBounds = {left:point.x, right:point.x, top:point.y, bottom:point.y};
+    sparkNodes.forEach((spark, index) => {
+      const distance = 20 + index * 23;
+      spark.setAttribute('visibility', length > distance ? 'visible' : 'hidden');
+      const position = track.getPointAtLength(Math.max(0, length - distance));
+      glowBounds.left = Math.min(glowBounds.left, position.x);
+      glowBounds.right = Math.max(glowBounds.right, position.x);
+      glowBounds.top = Math.min(glowBounds.top, position.y);
+      glowBounds.bottom = Math.max(glowBounds.bottom, position.y);
+      spark.setAttribute('transform', `translate(${position.x.toFixed(2)} ${position.y.toFixed(2)})`);
+    });
+    softening.setAttribute('x', String(glowBounds.left - 52));
+    softening.setAttribute('y', String(glowBounds.top - 52));
+    softening.setAttribute('width', String(glowBounds.right - glowBounds.left + 104));
+    softening.setAttribute('height', String(glowBounds.bottom - glowBounds.top + 104));
     contacts.forEach(contact => {
       if (targetY >= contact.y - 110) contact.element.classList.add('is-seen');
       const touching = Math.abs(point.y - contact.y) < 34 && Math.abs(point.x - contact.x) < 40;
@@ -80,9 +125,12 @@
     const startY = hero.offsetHeight * .23;
     const end = document.getElementById('countdown');
     const height = Math.ceil(end.getBoundingClientRect().bottom + scrollY);
-    const closing = end.querySelector('.closing-star');
-    const endY = position(closing) + closing.getBoundingClientRect().height * .5;
+    const closing = end.querySelector('.closing-angel');
+    const closingAnchor = closing.querySelector('.symbol-touchpoint').getBoundingClientRect();
+    const endY = closingAnchor.top + scrollY + closingAnchor.height * .5;
     const knots = [{x: width * .81, y: startY}];
+    // Stay outside the hero typography before crossing to the first drawing.
+    knots.push({x:width - 14, y:hero.offsetHeight - 18});
     const contacts = [];
     scenes.forEach(scene => {
       const art = scene.querySelector('.scene-art');
@@ -112,6 +160,7 @@
     knots.push({x:edgeX, y:position(audience) + 24});
     knots.push({x:edgeX, y:position(audience) + audience.offsetHeight - 24});
     knots.push({x: width * .5, y: endY});
+    contacts.push({x:closingAnchor.left + closingAnchor.width * .5, y:endY, element:closing});
     let d = `M ${knots[0].x} ${knots[0].y}`;
     knots.slice(1).forEach((p, i) => {
       const previous = knots[i];
@@ -122,6 +171,25 @@
     journey.setAttribute('height', String(height));
     track.setAttribute('d', d);
     trail.setAttribute('d', d);
+    glow.setAttribute('d', d);
+    glowCore.setAttribute('d', d);
+    clearance.setAttribute('width', String(width));
+    clearance.setAttribute('height', String(height));
+    clearanceField.setAttribute('width', String(width));
+    clearanceField.setAttribute('height', String(height));
+    clearanceText.replaceChildren();
+    const readingBlocks = document.querySelectorAll('.masthead, .headline, .hero .eyebrow, .hero-quote, .hero-event, .invitation-footer, .scene-copy, .audience-section h2, .audience-copy, .closing-quote, #countdown-title, .event-date, .countdown-values, .event-contacts, .closing-signature, .back-to-top, .organization-details');
+    readingBlocks.forEach(element => {
+      const box = element.getBoundingClientRect();
+      if (!box.width || !box.height) return;
+      const rect = document.createElementNS(svgNS, 'rect');
+      const padding = compact ? 13 : 20;
+      rect.setAttribute('x', String(box.left - padding));
+      rect.setAttribute('y', String(box.top + scrollY - padding));
+      rect.setAttribute('width', String(box.width + padding * 2));
+      rect.setAttribute('height', String(box.height + padding * 2));
+      clearanceText.append(rect);
+    });
     const total = track.getTotalLength();
     trail.setAttribute('stroke-dasharray', String(total));
     const points = [];

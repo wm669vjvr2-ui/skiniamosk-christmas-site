@@ -12,12 +12,26 @@
   <link rel="preload" href="fonts/Carlito-Regular.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="fonts/AubreyPro-Regular.otf" as="font" type="font/otf" crossorigin>
   <link rel="preload" href="fonts/EkaterinaVelikayaOne.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="styles.css?v=20261111-unified-title">
-  <script src="invitation.js?v=20261111-diagonal" defer></script>
+  <link rel="stylesheet" href="styles.css?v=20261116-warm-light">
+  <script src="invitation.js?v=20261116-warm-light" defer></script>
 </head>
 <body>
   <svg class="star-journey" id="star-journey" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" hidden>
     <path id="journey-track" class="journey-track" fill="none"/>
+    <defs>
+      <mask id="reading-clearance" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse" x="0" y="0">
+        <rect id="reading-clearance-field" fill="white"/>
+        <g id="reading-clearance-text" fill="black"></g>
+      </mask>
+      <radialGradient id="warm-star-light"><stop offset="0" stop-color="#fff0c5" stop-opacity=".4"/><stop offset=".35" stop-color="#ffd294" stop-opacity=".16"/><stop offset="1" stop-color="#ffd294" stop-opacity="0"/></radialGradient>
+      <filter id="route-soften" filterUnits="userSpaceOnUse" x="0" y="0" width="1" height="1"><feGaussianBlur stdDeviation="9"/></filter>
+    </defs>
+    <g class="journey-light" mask="url(#reading-clearance)">
+      <path id="journey-glow" class="journey-glow" fill="none"/>
+      <path id="journey-glow-core" class="journey-glow-core" fill="none"/>
+      <g id="journey-sparks" class="journey-sparks"></g>
+      <g id="travelling-light"><circle class="star-lamplight" r="32" fill="url(#warm-star-light)"/></g>
+    </g>
     <path id="journey-trail" class="journey-trail" fill="none"/>
     <g id="travelling-star"><use href="#bethlehem-star" x="-11" y="-17" width="22" height="33"/></g>
   </svg>
@@ -86,7 +100,8 @@
     </div>
     <footer class="invitation-footer">
       <a class="open-invitation" id="open-invitation" href="#unexpected">
-        <span>Открыть приглашение</span><span class="arrow" aria-hidden="true">⟶</span>
+        <span class="scripture-copy">«Я свет миру; кто последует за Мною, тот не будет ходить во тьме».</span>
+        <span class="scripture-source">Иоанна 8:12 <span class="arrow" aria-hidden="true">↓</span></span>
       </a>
     </footer>
   </main>
@@ -100,12 +115,14 @@
           <p>Мир ожидал великого события, но не сразу узнал его в младенце, лежащем в яслях.</p>
         </div>
       </div>
-      <div class="scene-art scene-art--manger" role="img" aria-label="Ясли с младенцем">
+      <div class="scene-art scene-art--manger" role="img" aria-label="Мария и Иосиф у яслей с младенцем">
         <span class="symbol-touchpoint" aria-hidden="true"></span>
         <svg class="symbol-drawing" viewBox="0 0 240 240" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-          <path class="symbol-ink" pathLength="1" d="M120 28L124 43L139 47L124 51L120 66L116 51L101 47L116 43ZM88 79q-16-8-27 5q-11 14 1 27q11 12 25 3q14-10 8-24q-2-6-7-11Z"/>
-          <path class="symbol-ink" pathLength="1" d="M68 96q4 4 8 1M91 99q22-8 43 4q27 16 41 33q-31 15-58 1q-20-10-29-24M98 100q-5 20 18 35M112 101q0 23 22 39M130 105q1 22 20 36"/>
-          <path class="symbol-ink" pathLength="1" d="M47 139H193L175 177H65ZM54 150H186M60 163H180M75 177L169 215M165 177L71 215M59 215H181M105 137L109 128M160 136L166 123M181 135L191 124"/>
+          <path class="symbol-ink" pathLength="1" d="M38 143C34 118 44 96 62 89C73 85 83 89 88 97C75 93 63 102 59 116C55 131 53 147 55 163M57 109C64 97 79 96 85 104C90 113 82 123 72 124C61 124 55 117 57 109Z"/>
+          <path class="symbol-ink" pathLength="1" d="M49 122C43 142 43 177 48 202L91 201C92 187 87 177 77 173L72 144C76 139 81 135 89 132M51 200C60 198 76 199 89 201"/>
+          <path class="symbol-ink" pathLength="1" d="M165 80C173 72 187 77 192 86C200 99 191 112 179 113C166 111 157 100 160 89C161 85 163 82 165 80ZM171 115C159 119 157 138 158 158L154 200C170 205 185 204 199 202C204 179 201 146 191 124C185 113 179 112 171 115Z"/>
+          <path class="symbol-ink" pathLength="1" d="M167 124C163 142 165 158 172 174M176 119C183 142 183 174 179 197M163 150L148 145"/>
+          <path class="symbol-ink" pathLength="1" d="M100 140C100 131 108 125 115 127C124 128 127 134 126 140M125 133C137 128 146 133 151 141M95 143C107 139 140 140 153 144L145 173L103 174ZM99 150C115 147 139 147 150 150M104 173L96 189M143 173L151 189"/>
         </svg>
       </div>
     </section>
@@ -120,9 +137,8 @@
       <div class="scene-art scene-art--star" role="img" aria-label="Вифлеемская звезда">
         <span class="symbol-touchpoint" aria-hidden="true"></span>
         <svg class="symbol-drawing" viewBox="0 0 240 240" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-          <path class="symbol-ink" pathLength="1" d="M120 22L130 96L174 65L141 109L211 120L141 131L174 176L130 144L120 218L110 144L66 176L99 131L29 120L99 109L66 65L110 96Z"/>
-<path class="symbol-ink" pathLength="1" d="M120 22V218M29 120H211M86 86L154 154M86 154L154 86M120 103l7 17-7 17-7-17Z"/>
-<path class="symbol-ink" pathLength="1" d="M43 49l6 9M191 49l-6 9M43 191l6-9M191 191l-6-9"/>
+          <path class="symbol-ink" pathLength="1" d="M119 49C123 61 128 76 132 88L172 88C164 97 151 106 142 114L154 153C143 150 129 138 119 132L86 154C88 140 95 125 97 115L65 90C79 88 95 89 106 88L119 49Z"/>
+          <path class="symbol-ink" pathLength="1" d="M119 17L119 34M164 37L150 54M190 74L177 79M194 124L178 120M168 174L153 159M118 191L119 172M69 178L83 162M39 130L57 123M42 72L58 78M73 37L85 53"/>
         </svg>
       </div>
     </section>
@@ -138,9 +154,9 @@
       <div class="scene-art scene-art--love" role="img" aria-label="Сердце в ладонях">
         <span class="symbol-touchpoint" aria-hidden="true"></span>
         <svg class="symbol-drawing" viewBox="0 0 240 240" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-          <path class="symbol-ink" pathLength="1" d="M120 120C105 110 79 93 85 75C92 53 114 57 120 75C126 57 148 53 155 75C161 93 135 110 120 120Z"/>
-<path class="symbol-ink" pathLength="1" d="M34 183l23-33q6-9 17-9h25q12 0 12 8q0 9-12 9H78M111 151l11 10q8 8 0 15l-28 15q-8 4-16 2l-7-2-14 17M34 183l23 25M25 192l23 25M206 183l-23-33q-6-9-17-9h-25q-12 0-12 8q0 9 12 9h21M129 151l-11 10M122 176l24 15q8 4 16 2l7-2 14 17M206 183l-23 25M215 192l-23 25"/>
-<path class="symbol-ink" pathLength="1" d="M120 32v10M72 44l6 8M168 44l-6 8"/>
+          <path class="symbol-ink" pathLength="1" d="M120 116C108 104 84 88 83 73C82 57 100 50 111 61L120 73C126 53 148 50 156 66C169 87 140 105 120 116Z"/>
+          <path class="symbol-ink" pathLength="1" d="M33 173C43 159 52 147 64 140C73 136 88 138 99 139C112 139 114 151 102 154L79 156M107 148L123 164C130 171 124 179 115 183L86 197L73 194L57 213M32 173L58 212L48 220L24 183"/>
+          <path class="symbol-ink" pathLength="1" d="M208 174C198 160 188 147 176 140C167 136 153 138 141 139C128 139 126 151 138 154L161 156M133 148L120 161M124 180L154 197L168 193L184 213M208 174L183 212L193 220L217 183"/>
         </svg>
       </div>
     </section>
@@ -156,8 +172,8 @@
       <div class="scene-art scene-art--cross" role="img" aria-label="Крест">
         <span class="symbol-touchpoint" aria-hidden="true"></span>
         <svg class="symbol-drawing" viewBox="0 0 240 240" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-          <path class="symbol-ink" pathLength="1" d="M104 29H136V91H188V123H136V210H104V123H52V91H104Z"/>
-<path class="symbol-ink" pathLength="1" d="M120 42V199M65 107H175M56 218q64-20 128 0M120 5v10M83 18l6 10M157 18l-6 10M24 107H38M202 107H216"/>
+          <path class="symbol-ink" pathLength="1" d="M104 37L136 36L135 93L183 94L184 123L136 124L137 205L104 206L105 124L57 123L56 94L104 93Z"/>
+          <path class="symbol-ink" pathLength="1" d="M69 215C95 209 144 208 171 216M120 12L120 24M72 40L82 51M167 40L158 51M34 101L44 104M199 102L210 100"/>
         </svg>
       </div>
     </section>
@@ -171,12 +187,18 @@
     </div>
   </section>
   <footer class="countdown-section" id="countdown" data-event-date="2026-12-20T11:00:00+03:00" aria-labelledby="countdown-title">
-    <svg class="closing-star" aria-hidden="true" viewBox="0 0 100 150"><use href="#bethlehem-star"/></svg>
+    <div class="scene-art scene-art--angel closing-angel" role="img" aria-label="Ангел">
+      <span class="symbol-touchpoint" aria-hidden="true"></span>
+      <svg class="symbol-drawing" viewBox="0 0 240 240" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+        <path class="symbol-ink" pathLength="1" d="M79 58C87 48 111 46 116 52C117 59 92 66 81 63C77 62 76 60 79 58Z"/>
+        <path class="symbol-ink" pathLength="1" d="M83 76C94 65 110 70 115 82C120 96 111 111 97 113C82 114 74 103 77 90C78 84 80 79 83 76Z"/>
+        <path class="symbol-ink" pathLength="1" d="M117 112C128 103 134 90 146 83C158 75 177 73 182 83C183 91 171 96 164 96C181 96 177 109 161 112C172 118 162 129 149 128L133 124"/>
+        <path class="symbol-ink" pathLength="1" d="M110 118C112 138 127 166 157 179C162 167 164 149 168 139C144 136 127 126 110 118ZM166 141C180 141 183 150 174 157M156 178C163 181 170 178 174 171L173 154"/>
+      </svg>
+    </div>
     <blockquote class="closing-quote">
       <p>«Бог подарил миру гораздо больше,<br> чем люди могли попросить»</p>
-      <cite>Из рождественского спектакля</cite>
     </blockquote>
-    <p class="eyebrow">В ОЖИДАНИИ ЧУДА</p>
     <h2 id="countdown-title">До нашей встречи</h2>
     <p class="event-date"><time datetime="2026-12-20T11:00:00+03:00">20 декабря 2026 года · начало в 11:00</time></p>
     <p id="countdown-pending" class="countdown-pending">До встречи 20 декабря!</p>
