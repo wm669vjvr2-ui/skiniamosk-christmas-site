@@ -5,6 +5,7 @@
   const media = matchMedia('(prefers-reduced-motion: reduce)');
   let heroVisible = true;
   let refreshJourney = () => {};
+  let pauseJourney = () => {};
 
   function reflectMotion() {
     root.dataset.motionOff = String(media.matches);
@@ -17,6 +18,7 @@
   function reflectVisibility() {
     root.dataset.offscreen = String(document.hidden || !heroVisible);
     root.dataset.pageHidden = String(document.hidden);
+    pauseJourney();
   }
   document.addEventListener('visibilitychange', reflectVisibility);
   if ('IntersectionObserver' in window) {
@@ -58,28 +60,73 @@
   const hero = document.getElementById('main');
   const scenes = Array.from(document.querySelectorAll('.story-scene'));
   let geometry = null;
-  let pendingFrame = false;
-  let rebuildFrame = false;
+  let renderFrame = 0;
+  let rebuildFrame = 0;
+  let displayedLength = null;
+  let previousTime = null;
+  let snapPosition = true;
+  let previousScroll = scrollY;
 
-  function updateJourney() {
-    pendingFrame = false;
-    if (!geometry || media.matches) return;
-    const {points, total, startY, endY, heroHeight, contacts} = geometry;
+  function pointAtLength(length, data = geometry) {
+    const value = Math.min(data.total, Math.max(0, length));
+    const index = Math.min(data.points.length - 2, Math.floor(value / data.step));
+    const a = data.points[index], b = data.points[index + 1];
+    const t = (value - a.length) / Math.max(.0001, b.length - a.length);
+    return {x:a.x + (b.x - a.x) * t, y:a.y + (b.y - a.y) * t};
+  }
+
+  function lengthAtY(y, data = geometry) {
+    const {points} = data;
+    if (y <= points[0].y) return 0;
+    if (y >= points[points.length - 1].y) return data.total;
+    let lo = 0, hi = points.length - 1;
+    while (hi - lo > 1) {
+      const mid = Math.floor((lo + hi) / 2);
+      if (points[mid].y < y) lo = mid; else hi = mid;
+    }
+    const a = points[lo], b = points[hi];
+    const t = Math.min(1, Math.max(0, (y - a.y) / Math.max(.0001, b.y - a.y)));
+    return a.length + (b.length - a.length) * t;
+  }
+
+  function cancelJourney() {
+    if (renderFrame) cancelAnimationFrame(renderFrame);
+    if (rebuildFrame) cancelAnimationFrame(rebuildFrame);
+    renderFrame = rebuildFrame = 0;
+    previousTime = null;
+  }
+
+  function updateJourney(time) {
+    renderFrame = 0;
+    if (!geometry || media.matches || document.hidden) {
+      previousTime = null;
+      return;
+    }
+    const {total, startY, endY, heroHeight, contacts} = geometry;
     if (scrollY > 3) root.dataset.journeyStarted = 'true';
     // Keep the star in view instead of tying its speed to the full page height.
     // Ease its viewport anchor from the hero seed to the reading area.
     const handoff = Math.min(1, Math.max(0, scrollY / (heroHeight * .5)));
     const anchorY = startY + (innerHeight * .45 - startY) * handoff;
     const targetY = Math.min(endY, Math.max(startY, scrollY + anchorY));
-    let lo = 0, hi = points.length - 1;
-    while (hi - lo > 1) {
-      const mid = Math.floor((lo + hi) / 2);
-      if (points[mid].y < targetY) lo = mid; else hi = mid;
+    const targetLength = lengthAtY(targetY);
+    const dt = previousTime === null ? 1000 / 60 : Math.min(32, Math.max(1, time - previousTime));
+    previousTime = time;
+    if (snapPosition || displayedLength === null) {
+      displayedLength = targetLength;
+      snapPosition = false;
+    } else {
+      displayedLength += (targetLength - displayedLength) * (1 - Math.exp(-dt / 40));
+      // Ease wheel steps without letting the guide fall behind the reading area.
+      const maxLag = Math.min(32, innerHeight * .04);
+      const shownY = pointAtLength(displayedLength).y;
+      if (shownY < targetY - maxLag) displayedLength = lengthAtY(targetY - maxLag);
+      if (shownY > targetY + maxLag) displayedLength = lengthAtY(targetY + maxLag);
     }
-    const a = points[lo], b = points[hi];
-    const ratio = Math.min(1, Math.max(0, (targetY - a.y) / Math.max(.01, b.y - a.y)));
-    const length = a.length + (b.length - a.length) * ratio;
-    const point = track.getPointAtLength(length);
+    const settling = Math.abs(targetLength - displayedLength) > .05;
+    if (!settling) displayedLength = targetLength;
+    const length = displayedLength;
+    const point = pointAtLength(length);
     const transform = `translate(${point.x.toFixed(2)} ${point.y.toFixed(2)})`;
     follower.setAttribute('transform', transform);
     lamplight.setAttribute('transform', transform);
@@ -87,7 +134,7 @@
     // Only the last short part of the route emits light. The page-space mask
     // leaves a dark safety margin around every reading block.
     const tail = Math.min(length, 200);
-    const tailStart = track.getPointAtLength(Math.max(0, length - tail));
+    const tailStart = pointAtLength(length - tail);
     fade.setAttribute('x1', String(tailStart.x));
     fade.setAttribute('y1', String(tailStart.y));
     fade.setAttribute('x2', String(point.x));
@@ -100,7 +147,7 @@
     // Include the entire luminous tail, not only the shorter sparkle positions.
     // Leave room for the full blur so no filter edge can cut a straight line.
     for (let sample = 0; sample <= 12; sample++) {
-      const position = track.getPointAtLength(Math.max(0, length - tail * sample / 12));
+      const position = pointAtLength(length - tail * sample / 12);
       glowBounds.left = Math.min(glowBounds.left, position.x);
       glowBounds.right = Math.max(glowBounds.right, position.x);
       glowBounds.top = Math.min(glowBounds.top, position.y);
@@ -110,7 +157,7 @@
       const distance = 20 + index * 23;
       spark.setAttribute('visibility', length > distance ? 'visible' : 'hidden');
       spark.setAttribute('opacity', String(Math.pow(Math.max(0, 1 - distance / Math.max(1, tail)), 1.5)));
-      const position = track.getPointAtLength(Math.max(0, length - distance));
+      const position = pointAtLength(length - distance);
       glowBounds.left = Math.min(glowBounds.left, position.x);
       glowBounds.right = Math.max(glowBounds.right, position.x);
       glowBounds.top = Math.min(glowBounds.top, position.y);
@@ -126,15 +173,24 @@
       const touching = Math.abs(point.y - contact.y) < 34 && Math.abs(point.x - contact.x) < 40;
       contact.element.classList.toggle('is-lit', touching);
     });
+    if (settling) renderFrame = requestAnimationFrame(updateJourney);
+    else previousTime = null;
   }
   function requestJourney() {
-    if (!pendingFrame) {
-      pendingFrame = true;
-      requestAnimationFrame(updateJourney);
-    }
+    // An instant anchor/Home/End jump should land correctly, not fly through
+    // several offscreen sections. Ordinary scrolling gets a short easing.
+    if (Math.abs(scrollY - previousScroll) > innerHeight * .75) snapPosition = true;
+    previousScroll = scrollY;
+    if (!renderFrame && !media.matches && !document.hidden) renderFrame = requestAnimationFrame(updateJourney);
   }
   function rebuildJourney() {
-    rebuildFrame = false;
+    rebuildFrame = 0;
+    if (document.hidden || media.matches) return;
+    if (renderFrame) cancelAnimationFrame(renderFrame);
+    renderFrame = 0;
+    previousTime = null;
+    const previousPoint = geometry && displayedLength !== null ? pointAtLength(displayedLength) : null;
+    const previousWidth = geometry && geometry.width;
     const width = document.documentElement.clientWidth;
     const compact = width <= 640;
     const position = element => element.getBoundingClientRect().top + scrollY;
@@ -148,7 +204,7 @@
     // Stay outside the hero typography before crossing to the first drawing.
     knots.push({x:width - 14, y:hero.offsetHeight - 18});
     const contacts = [];
-    scenes.forEach(scene => {
+    scenes.forEach((scene, index) => {
       const art = scene.querySelector('.scene-art');
       const anchor = art.querySelector('.symbol-touchpoint').getBoundingClientRect();
       const artBox = art.getBoundingClientRect();
@@ -164,7 +220,7 @@
       const exitsRight = scene.dataset.pathSide === 'right';
       // Cross diagonally through the illustration above the text, then follow
       // the outside margin until the next illustration changes the direction.
-      const entryX = exitsRight ? leftRail : rightRail;
+      const entryX = index === 0 ? width - 14 : (exitsRight ? leftRail : rightRail);
       const exitX = exitsRight ? rightRail : leftRail;
       knots.push({x:entryX, y:top + 16});
       knots.push({x, y});
@@ -175,7 +231,7 @@
     const edgeX = compact ? 12 : width * .1;
     knots.push({x:edgeX, y:position(audience) + 24});
     knots.push({x:edgeX, y:position(audience) + audience.offsetHeight - 24});
-    knots.push({x: width * .5, y: endY});
+    knots.push({x: closingAnchor.left + closingAnchor.width * .5, y: endY});
     contacts.push({x:closingAnchor.left + closingAnchor.width * .5, y:endY, element:closing});
     let d = `M ${knots[0].x} ${knots[0].y}`;
     knots.slice(1).forEach((p, i) => {
@@ -224,25 +280,39 @@
     const total = track.getTotalLength();
     trail.setAttribute('stroke-dasharray', String(total));
     const points = [];
-    for (let i = 0; i <= 500; i++) {
-      const length = total * i / 500;
+    const segments = Math.min(4096, Math.max(256, Math.ceil(total / 3)));
+    for (let i = 0; i <= segments; i++) {
+      const length = total * i / segments;
       const point = track.getPointAtLength(length);
-      points.push({y:point.y, length});
+      points.push({x:point.x, y:point.y, length});
     }
-    geometry = {points,total,startY,endY,contacts,heroHeight:Math.max(1,hero.offsetHeight)};
+    geometry = {points,total,startY,endY,contacts,width,step:total / segments,heroHeight:Math.max(1,hero.offsetHeight)};
+    displayedLength = previousPoint ? lengthAtY(previousPoint.y) : null;
+    if (previousWidth !== width || displayedLength === null) snapPosition = true;
+    // Render the measured position before revealing the SVG; no origin flash.
+    updateJourney(performance.now());
     journey.removeAttribute('hidden');
-    updateJourney();
   }
   function requestRebuild() {
-    if (!rebuildFrame) {
-      rebuildFrame = true;
-      requestAnimationFrame(rebuildJourney);
-    }
+    if (!rebuildFrame && !document.hidden && !media.matches) rebuildFrame = requestAnimationFrame(rebuildJourney);
   }
-  refreshJourney = () => { requestRebuild(); };
+  refreshJourney = () => {
+    snapPosition = true;
+    if (media.matches) cancelJourney();
+    requestRebuild();
+  };
+  pauseJourney = () => {
+    if (document.hidden) cancelJourney();
+    else { snapPosition = true; requestRebuild(); }
+  };
   window.addEventListener('scroll', requestJourney, {passive:true});
   window.addEventListener('resize', requestRebuild, {passive:true});
-  window.addEventListener('pageshow', requestRebuild);
+  window.addEventListener('pageshow', () => { snapPosition = true; requestRebuild(); });
+  window.addEventListener('pagehide', cancelJourney);
+  if ('ResizeObserver' in window) {
+    const observer = new ResizeObserver(requestRebuild);
+    [hero, ...scenes, document.querySelector('.audience-section'), document.getElementById('countdown')].forEach(element => observer.observe(element));
+  }
   document.fonts.ready.then(requestRebuild);
   requestRebuild();
 
