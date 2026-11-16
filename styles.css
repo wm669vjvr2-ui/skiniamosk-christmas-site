@@ -61,7 +61,7 @@ html[data-enhanced=true] .falling-star{top:-40px;animation:star-fall var(--durat
 .journey-track{stroke:var(--silver);stroke-width:.8;opacity:.08}
 .journey-trail{stroke:var(--champagne);stroke-width:.8;opacity:.32;stroke-linecap:round}
 #travelling-star{filter:drop-shadow(0 0 3px #fff0c540)}
-.journey-glow,.journey-glow-core{stroke:var(--champagne);stroke-linecap:round}
+.journey-glow,.journey-glow-core{stroke-linecap:round}
 .journey-glow{stroke-width:24;opacity:.15;filter:url(#route-soften)}
 .journey-glow-core{stroke-width:1;opacity:.12}
 .journey-light{pointer-events:none}

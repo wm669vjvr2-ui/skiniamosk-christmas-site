@@ -39,6 +39,7 @@
   const lamplight = document.getElementById('travelling-light');
   const glow = document.getElementById('journey-glow');
   const glowCore = document.getElementById('journey-glow-core');
+  const fade = document.getElementById('journey-fade');
   const softening = document.getElementById('route-soften');
   const sparks = document.getElementById('journey-sparks');
   const clearance = document.getElementById('reading-clearance');
@@ -86,14 +87,29 @@
     // Only the last short part of the route emits light. The page-space mask
     // leaves a dark safety margin around every reading block.
     const tail = Math.min(length, 200);
+    const tailStart = track.getPointAtLength(Math.max(0, length - tail));
+    fade.setAttribute('x1', String(tailStart.x));
+    fade.setAttribute('y1', String(tailStart.y));
+    fade.setAttribute('x2', String(point.x));
+    fade.setAttribute('y2', String(point.y));
     [glow, glowCore].forEach(path => {
       path.setAttribute('stroke-dasharray', `${Math.max(.01, tail)} ${total}`);
       path.setAttribute('stroke-dashoffset', String(tail - length));
     });
     const glowBounds = {left:point.x, right:point.x, top:point.y, bottom:point.y};
+    // Include the entire luminous tail, not only the shorter sparkle positions.
+    // Leave room for the full blur so no filter edge can cut a straight line.
+    for (let sample = 0; sample <= 12; sample++) {
+      const position = track.getPointAtLength(Math.max(0, length - tail * sample / 12));
+      glowBounds.left = Math.min(glowBounds.left, position.x);
+      glowBounds.right = Math.max(glowBounds.right, position.x);
+      glowBounds.top = Math.min(glowBounds.top, position.y);
+      glowBounds.bottom = Math.max(glowBounds.bottom, position.y);
+    }
     sparkNodes.forEach((spark, index) => {
       const distance = 20 + index * 23;
       spark.setAttribute('visibility', length > distance ? 'visible' : 'hidden');
+      spark.setAttribute('opacity', String(Math.pow(Math.max(0, 1 - distance / Math.max(1, tail)), 1.5)));
       const position = track.getPointAtLength(Math.max(0, length - distance));
       glowBounds.left = Math.min(glowBounds.left, position.x);
       glowBounds.right = Math.max(glowBounds.right, position.x);
@@ -101,10 +117,10 @@
       glowBounds.bottom = Math.max(glowBounds.bottom, position.y);
       spark.setAttribute('transform', `translate(${position.x.toFixed(2)} ${position.y.toFixed(2)})`);
     });
-    softening.setAttribute('x', String(glowBounds.left - 52));
-    softening.setAttribute('y', String(glowBounds.top - 52));
-    softening.setAttribute('width', String(glowBounds.right - glowBounds.left + 104));
-    softening.setAttribute('height', String(glowBounds.bottom - glowBounds.top + 104));
+    softening.setAttribute('x', String(glowBounds.left - 64));
+    softening.setAttribute('y', String(glowBounds.top - 64));
+    softening.setAttribute('width', String(glowBounds.right - glowBounds.left + 128));
+    softening.setAttribute('height', String(glowBounds.bottom - glowBounds.top + 128));
     contacts.forEach(contact => {
       if (targetY >= contact.y - 110) contact.element.classList.add('is-seen');
       const touching = Math.abs(point.y - contact.y) < 34 && Math.abs(point.x - contact.x) < 40;
@@ -182,13 +198,28 @@
     readingBlocks.forEach(element => {
       const box = element.getBoundingClientRect();
       if (!box.width || !box.height) return;
-      const rect = document.createElementNS(svgNS, 'rect');
       const padding = compact ? 13 : 20;
-      rect.setAttribute('x', String(box.left - padding));
-      rect.setAttribute('y', String(box.top + scrollY - padding));
-      rect.setAttribute('width', String(box.width + padding * 2));
-      rect.setAttribute('height', String(box.height + padding * 2));
-      clearanceText.append(rect);
+      const feather = 24;
+      const x = box.left - padding, y = box.top + scrollY - padding;
+      const w = box.width + padding * 2, h = box.height + padding * 2;
+      const addRect = (left, top, width, height, edge) => {
+        const rect = document.createElementNS(svgNS, 'rect');
+        rect.setAttribute('x', String(left)); rect.setAttribute('y', String(top));
+        rect.setAttribute('width', String(width)); rect.setAttribute('height', String(height));
+        rect.setAttribute('class', edge ? 'reading-feather' : 'reading-core');
+        if (edge) rect.setAttribute('fill', `url(#reading-fade-${edge})`);
+        clearanceText.append(rect);
+      };
+      addRect(x, y, w, h);
+      // Text stays fully protected; only the outside of its safety margin fades.
+      addRect(x - feather, y, feather, h, 'left');
+      addRect(x + w, y, feather, h, 'right');
+      addRect(x, y - feather, w, feather, 'top');
+      addRect(x, y + h, w, feather, 'bottom');
+      addRect(x - feather, y - feather, feather, feather, 'tl');
+      addRect(x + w, y - feather, feather, feather, 'tr');
+      addRect(x - feather, y + h, feather, feather, 'bl');
+      addRect(x + w, y + h, feather, feather, 'br');
     });
     const total = track.getTotalLength();
     trail.setAttribute('stroke-dasharray', String(total));
