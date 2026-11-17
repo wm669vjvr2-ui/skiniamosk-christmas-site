@@ -1,6 +1,6 @@
-@font-face{font-family:InvitationBody;src:local('Calibri'),url('fonts/Carlito-Regular.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
-@font-face{font-family:InvitationDisplay;src:url('fonts/AubreyPro-Regular.otf') format('opentype');font-weight:400;font-style:normal;font-display:swap}
-@font-face{font-family:InvitationScript;src:url('fonts/EkaterinaVelikayaOne.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap;ascent-override:120%;descent-override:90%;line-gap-override:0%}
+@font-face{font-family:InvitationBody;src:local('Calibri'),url('fonts/InvitationBody-Web.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:InvitationDisplay;src:url('fonts/AubreyPro-Web.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:InvitationScript;src:url('fonts/Ekaterina-Web.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap;ascent-override:120%;descent-override:90%;line-gap-override:0%}
 :root{
   color-scheme:dark;
   --wine:#80011F;--paper:#F7E6CA;--champagne:#F7E6CA;--silver:#d4d7d9;--ink:#80011F;
@@ -194,3 +194,5 @@ html:not([data-journey-started=true]) .star-journey{visibility:hidden}
 html[data-journey-started=true] .story-seed{display:none}
 html[data-offscreen=true] .story-seed{animation-play-state:paused}
 html[data-motion-off=true] .story-seed{animation:none;transform:none}
+
+:root[data-offscreen=true] .falling-star{will-change:auto}

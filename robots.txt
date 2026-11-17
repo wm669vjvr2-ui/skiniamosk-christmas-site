@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://wm669vjvr2-ui.github.io/skiniamosk-christmas-site/sitemap.xml

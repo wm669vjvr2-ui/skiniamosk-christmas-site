@@ -139,10 +139,16 @@
     fade.setAttribute('y1', String(tailStart.y));
     fade.setAttribute('x2', String(point.x));
     fade.setAttribute('y2', String(point.y));
-    [glow, glowCore].forEach(path => {
-      path.setAttribute('stroke-dasharray', `${Math.max(.01, tail)} ${total}`);
-      path.setAttribute('stroke-dashoffset', String(tail - length));
-    });
+    // Keep animated/filter surfaces local: only these 200 px shimmer, rather
+    // than an invisible dashed copy of the entire document-length path.
+    const tailSegments = Math.max(1, Math.ceil(tail / 4));
+    let lightPath = `M ${tailStart.x.toFixed(2)} ${tailStart.y.toFixed(2)}`;
+    for (let i = 1; i <= tailSegments; i++) {
+      const p = pointAtLength(length - tail + tail * i / tailSegments);
+      lightPath += ` L ${p.x.toFixed(2)} ${p.y.toFixed(2)}`;
+    }
+    glow.setAttribute('d', lightPath);
+    glowCore.setAttribute('d', lightPath);
     const glowBounds = {left:point.x, right:point.x, top:point.y, bottom:point.y};
     // Include the entire luminous tail, not only the shorter sparkle positions.
     // Leave room for the full blur so no filter edge can cut a straight line.
@@ -243,8 +249,6 @@
     journey.setAttribute('height', String(height));
     track.setAttribute('d', d);
     trail.setAttribute('d', d);
-    glow.setAttribute('d', d);
-    glowCore.setAttribute('d', d);
     clearance.setAttribute('width', String(width));
     clearance.setAttribute('height', String(height));
     clearanceField.setAttribute('width', String(width));
@@ -332,6 +336,7 @@
   const plural = (n, forms = ['день', 'дня', 'дней']) => n % 100 >= 11 && n % 100 <= 14 ? forms[2] : n % 10 === 1 ? forms[0] : n % 10 >= 2 && n % 10 <= 4 ? forms[1] : forms[2];
   let timer;
   function tick() {
+    if (document.hidden) return;
     const remaining = timestamp - Date.now();
     if (remaining <= 0) {
       values.hidden = true;

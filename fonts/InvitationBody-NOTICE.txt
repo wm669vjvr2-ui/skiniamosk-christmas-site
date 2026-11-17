@@ -1,0 +1,1 @@
+Invitation Body Web is a Latin/Cyrillic web subset of Carlito, renamed to respect the Reserved Font Name. Original authors and SIL OFL 1.1 terms: Carlito-OFL.txt. Prepared 2026-11-17. Glyph outlines and metrics are unchanged.
