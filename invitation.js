@@ -18,9 +18,13 @@
   function reflectVisibility() {
     root.dataset.offscreen = String(document.hidden || !heroVisible);
     root.dataset.pageHidden = String(document.hidden);
-    pauseJourney();
   }
-  document.addEventListener('visibilitychange', reflectVisibility);
+  // The hero observer only controls its ambient stars. Crossing that boundary
+  // must not rebuild/snap the page-wide guide halfway through its first turn.
+  document.addEventListener('visibilitychange', () => {
+    reflectVisibility();
+    pauseJourney();
+  });
   if ('IntersectionObserver' in window) {
     const observer = new IntersectionObserver(entries => {
       heroVisible = entries[0].isIntersecting;
