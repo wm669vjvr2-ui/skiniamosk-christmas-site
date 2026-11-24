@@ -9,7 +9,7 @@
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{margin:0;background:var(--wine);color:var(--paper)}
+body{position:relative;margin:0;background:var(--wine);color:var(--paper)}
 button,a{-webkit-tap-highlight-color:transparent}
 button{font:inherit}
 a{color:inherit}
@@ -37,7 +37,7 @@ html[data-font-metrics=legacy] .audience-section h2,html[data-font-metrics=legac
 .scripture-source .arrow{font-size:19px}
 .arrow{font-size:29px;line-height:1;font-family:Georgia,serif;transition:transform .2s ease}
 .starfall{position:absolute;inset:0;pointer-events:none;z-index:-1;overflow:hidden}
-.falling-star{position:absolute;top:var(--rest-y);width:var(--size);height:calc(var(--size)*1.5);left:var(--x);opacity:var(--opacity);animation:none;will-change:transform}
+.falling-star{position:absolute;top:var(--rest-y);width:var(--size);height:calc(var(--size)*1.5);left:var(--x);opacity:var(--opacity);animation:none}
 html[data-enhanced=true] .falling-star{top:-40px;animation:star-fall var(--duration) linear var(--delay) infinite}
 @keyframes star-fall{from{transform:translate3d(0,-8vh,0) rotate(-12deg)}to{transform:translate3d(var(--drift),120vh,0) rotate(32deg)}}
 :root[data-offscreen=true] .falling-star,:root[data-dialog=true] .falling-star{animation-play-state:paused}
@@ -57,21 +57,12 @@ html[data-enhanced=true] .falling-star{top:-40px;animation:star-fall var(--durat
 .organization-details p{margin:0}
 .no-wrap{white-space:nowrap}
 .organization-details p+p{margin-top:8px}
-.star-journey{position:absolute;inset:0;pointer-events:none;width:100%;overflow:visible;z-index:3}
-.journey-track{stroke:var(--silver);stroke-width:.8;opacity:.08}
-.journey-trail{stroke:var(--champagne);stroke-width:.8;opacity:.32;stroke-linecap:round}
-#travelling-star{filter:drop-shadow(0 0 3px #fff0c540)}
-.journey-glow,.journey-glow-core{stroke-linecap:round}
-.journey-glow{stroke-width:24;opacity:.15;filter:url(#route-soften)}
-.journey-glow-core{stroke-width:1;opacity:.12}
-.journey-light{pointer-events:none}
-.journey-glow-core,.star-lamplight{animation:warm-breath 4.8s ease-in-out infinite}
-.journey-spark{fill:var(--champagne);opacity:.2;animation:spark-shimmer 3.9s ease-in-out infinite}
-.journey-sparks g:nth-child(2n) .journey-spark{animation-delay:-1.6s}
-.journey-sparks g:nth-child(3n) .journey-spark{animation-delay:-2.8s}
-@keyframes warm-breath{0%,100%{opacity:.09}50%{opacity:.18}}
-@keyframes spark-shimmer{0%,100%{opacity:.09}50%{opacity:.4}}
-:root[data-page-hidden=true] .journey-glow-core,:root[data-page-hidden=true] .star-lamplight,:root[data-page-hidden=true] .journey-spark{animation-play-state:paused}
+.star-journey{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:3}
+.journey-route{position:absolute;inset:0 auto auto 0;width:100%}
+.journey-track{stroke:var(--champagne);stroke-width:.8;opacity:.24}
+.journey-light,.travelling-star{position:absolute;top:0;left:0;contain:strict}
+.travelling-star{width:22px;height:33px}
+.travelling-star svg{display:block;width:100%;height:100%}
 .story{position:relative}
 .story-scene{position:relative;display:grid;grid-template-columns:minmax(0,1fr);justify-items:center;align-items:start;gap:44px;padding:90px max(var(--gutter),8vw);background:var(--wine);border-top:1px solid #fff1dd0e}
 .scene-copy{position:relative;min-width:0;width:min(100%,700px);z-index:4;grid-column:1;grid-row:2}
@@ -109,9 +100,9 @@ html[data-enhanced=true] .scene-art.is-seen .symbol-ink{stroke-dashoffset:0}
 html[data-motion-off=true] .symbol-drawing{opacity:1!important;transform:none!important;filter:none!important;transition:none}
 html[data-motion-off=true] .symbol-ink{stroke-dashoffset:0;transition:none}
 html[data-motion-off=true] .star-journey{display:none}
-html[data-motion-off=true] .journey-glow-core,html[data-motion-off=true] .star-lamplight,html[data-motion-off=true] .journey-spark{animation:none}
 html[data-motion-off=true] .falling-star{animation:none;top:var(--rest-y);transform:none;will-change:auto}
 @media(hover:hover){.open-invitation:hover{background:#f4dec4}.open-invitation:hover .arrow{transform:translateX(4px)}}
+@media(max-width:64rem){.falling-star:nth-child(n+13){display:none}}
 @media(min-width:100rem){.hero{padding-block:32px 50px}.guiding-star{margin-bottom:45px;width:74px;height:111px}}
 @media(max-width:40rem){
   .invitation{min-height:max(700px,100svh)}
@@ -126,7 +117,9 @@ html[data-motion-off=true] .falling-star{animation:none;top:var(--rest-y);transf
   .invitation-footer{padding:16px 24px max(24px,env(safe-area-inset-bottom))}
   .open-invitation{min-height:110px;font-size:18px;width:100%;max-width:360px;padding:15px 19px}
   .countdown-section .closing-angel{width:175px;margin-bottom:30px}
-  .falling-star:nth-child(n+15){display:none}
+  .falling-star:nth-child(n+7){display:none}
+  html[data-enhanced=true] .symbol-ink{stroke-dashoffset:0;transition:none}
+  .scene-art.is-seen .symbol-drawing,.scene-art.is-lit .symbol-drawing{filter:drop-shadow(0 0 5px #ffda9c90)}
   .countdown-section{padding:54px 24px 25px}
   .countdown-pending{font-size:21px}
   .countdown-values{gap:4px}
@@ -194,5 +187,3 @@ html:not([data-journey-started=true]) .star-journey{visibility:hidden}
 html[data-journey-started=true] .story-seed{display:none}
 html[data-offscreen=true] .story-seed{animation-play-state:paused}
 html[data-motion-off=true] .story-seed{animation:none;transform:none}
-
-:root[data-offscreen=true] .falling-star{will-change:auto}
